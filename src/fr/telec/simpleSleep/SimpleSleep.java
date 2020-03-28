@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -22,7 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
-import fr.telec.utils.Language;
+import fr.telec.simpleCore.Language;
 
 public class SimpleSleep extends JavaPlugin implements Listener {
 
@@ -75,6 +76,11 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerBedEnterEvent(PlayerBedEnterEvent evt) {
+		try {
+			Sound sound = Sound.valueOf(""+getConfig().getString("sound.sleep"));
+			evt.getPlayer().playSound(evt.getPlayer().getLocation(), sound, 10, 1);
+		}catch (IllegalArgumentException  e) {}
+		
 		refreshStats(evt);
 		sendMessage(formatMessage(evt.getPlayer(), lg.get("enter_bed")));
         checkAndSleep();
@@ -86,6 +92,11 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 		if(evt.getPlayer().getWorld().getTime() > NIGHT_TICK) {
 			refreshStats(evt);
 			sendMessage(formatMessage(evt.getPlayer(), lg.get("leave_bed")));
+		} else {
+			try {
+				Sound sound = Sound.valueOf(""+getConfig().getString("sound.wakeup"));
+				evt.getPlayer().playSound(evt.getPlayer().getLocation(), sound, 10, 1);
+			}catch (IllegalArgumentException  e) {}
 		}
 	}
 	

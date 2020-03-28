@@ -1,7 +1,7 @@
 name: simpleSleep
 prefix: simpleSleep
 main: fr.telec.simpleSleep.SimpleSleep
-version: 1.0
+version: 1.1
 api-version: 1.15
 load: POSTWORLD
 softdepend:
