@@ -1,9 +1,16 @@
 name: simpleSleep
 prefix: simpleSleep
 main: fr.telec.simpleSleep.SimpleSleep
-version: 0.1
+version: 1.0
 api-version: 1.15
 load: POSTWORLD
-authors: 
-  - telec16
+softdepend:
+- ActionBarAPI
+authors:
+- telec16
 commands:
+  update:
+    description: Update the configuration
+    usage: /<command>
+    permission: <plugin name>.<command>
+    permission-message: You don't have <permission>

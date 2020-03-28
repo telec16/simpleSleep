@@ -1,0 +1,9 @@
+percentage: 50
+count:
+- ADVENTURE
+- CREATIVE
+#- SPECTATOR
+- SURVIVAL
+use_actionbar: true
+sound_sleep: null
+sound_wakeup: null
