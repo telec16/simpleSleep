@@ -1,7 +1,9 @@
 package fr.telec.simpleSleep;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
 import fr.telec.simpleCore.Language;
+import fr.telec.simpleCore.StringHandler;
 
 public class SimpleSleep extends JavaPlugin implements Listener {
 
@@ -43,8 +46,10 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
+		
 		saveDefaultConfig();
 		reloadConfig();
+		
 		lg = new Language(this);
 
 		refreshCountableGameMode();
@@ -63,8 +68,8 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 			
 			refreshCountableGameMode();
 			goal = getConfig().getInt("percentage");
-			
-			sender.sendMessage(ChatColor.GRAY + lg.get("updated"));
+
+			sender.sendMessage(ChatColor.GRAY + "[" + getName() + "]" + lg.get("updated"));
 			return true;
 		}
 		return false;
@@ -165,6 +170,8 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 	}
 	
 	private void sendMessage(String msg) {
+		msg = StringHandler.colorize(msg);
+		
 		if(getConfig().getBoolean("use_actionbar")) {
 			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 				if (isCountable(player)) {
@@ -179,13 +186,14 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 	private String formatMessage(Player player, String msg) {
 		Integer percentage = (int) ((total == 0) ? 100 : Math.round(100.0 * (float) inBed / (float) total));
 
-		msg = msg.replace("<player>", player.getDisplayName())
-				.replace("<count>", inBed.toString())
-				.replace("<total>", total.toString())
-				.replace("<percentage>", percentage.toString())
-		        .replace("<goal>", goal.toString());
+		Map<String, String> values = new HashMap<String, String>();
+		values.put("player", player.getDisplayName());
+		values.put("count", inBed.toString());
+		values.put("total", total.toString());
+		values.put("percentage", percentage.toString());
+		values.put("goal", goal.toString());
 
-		return msg;
+		return StringHandler.format(msg, values);
 	}
 
 	private boolean isCountable(Player player) {

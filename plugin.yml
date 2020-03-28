@@ -1,7 +1,7 @@
 name: simpleSleep
 prefix: simpleSleep
 main: fr.telec.simpleSleep.SimpleSleep
-version: 1.1
+version: 1.2
 api-version: 1.15
 load: POSTWORLD
 softdepend:
@@ -12,5 +12,5 @@ commands:
   update:
     description: Update the configuration
     usage: /<command>
-    permission: <plugin name>.<command>
+    permission: simplesleep.update
     permission-message: You don't have <permission>
