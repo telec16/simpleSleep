@@ -135,9 +135,9 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 	 */
 
 	private void checkAndSleep() {
-		if(total == 0 || (float) inBed / (float) total >= (goal/100.0)) {
-			for(World w : Bukkit.getWorlds()){
-				if(w.getEnvironment() == Environment.NORMAL) {
+		if ((total == 0 && inBed > 0) || (total != 0 && (float) inBed / (float) total >= (goal / 100.0))) {
+			for (World w : Bukkit.getWorlds()) {
+				if (w.getEnvironment() == Environment.NORMAL) {
 					w.setTime(DAY_TICK);
 					w.setThundering(false);
 					w.setStorm(false);
