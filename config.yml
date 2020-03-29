@@ -7,4 +7,5 @@ count:
 use_actionbar: true
 sound:
   sleep: null
+  cant_sleep: null
   wakeup: null

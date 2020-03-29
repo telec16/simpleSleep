@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -18,7 +18,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,13 +26,20 @@ import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
 import fr.telec.simpleCore.Language;
 import fr.telec.simpleCore.StringHandler;
+import fr.telec.simpleCore.SoundHelper;
 
 public class SimpleSleep extends JavaPlugin implements Listener {
 
+	private static final int TICK_BEFORE_CHECK = 100;
 	private static final long DAY_TICK = 0;
 	private static final long NIGHT_TICK = 12010;
+	private static final long FULL_DAY_TICK = 24000;
+	private static final long MAX_WEATHER_TICK = (long) (7.5*FULL_DAY_TICK);
+	private static final long MIN_WEATHER_TICK = (long) (0.5*FULL_DAY_TICK);
 	
 	private Language lg;
+	private SoundHelper sh;
+	
 	private List<GameMode> countable;
 	private Integer inBed = 0;
 	private Integer total = 0;
@@ -51,6 +57,8 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 		reloadConfig();
 		
 		lg = new Language(this);
+		
+		sh = new SoundHelper(this);
 
 		refreshCountableGameMode();
 		goal = getConfig().getInt("percentage");
@@ -69,7 +77,7 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 			refreshCountableGameMode();
 			goal = getConfig().getInt("percentage");
 
-			sender.sendMessage(ChatColor.GRAY + "[" + getName() + "]" + lg.get("updated"));
+			sender.sendMessage(ChatColor.GRAY + "[" + getName() + "] " + lg.get("updated"));
 			return true;
 		}
 		return false;
@@ -81,27 +89,31 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerBedEnterEvent(PlayerBedEnterEvent evt) {
-		try {
-			Sound sound = Sound.valueOf(""+getConfig().getString("sound.sleep"));
-			evt.getPlayer().playSound(evt.getPlayer().getLocation(), sound, 10, 1);
-		}catch (IllegalArgumentException  e) {}
-		
-		refreshStats(evt);
-		sendMessage(formatMessage(evt.getPlayer(), lg.get("enter_bed")));
-        checkAndSleep();
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				if (evt.getPlayer().getSleepTicks() > 0) {
+
+					sh.playFromConfig(evt.getPlayer(), "sound.sleep");
+
+					refreshStats();
+					sendMessage(formatMessage(evt.getPlayer(), lg.get("enter_bed")));
+					checkAndSleep();
+				} else {
+					sh.playFromConfig(evt.getPlayer(), "sound.cant_sleep");
+				}
+			}
+		}, TICK_BEFORE_CHECK);
 	}
-	
+
 	@EventHandler
 	public void onPlayerBedLeaveEvent(PlayerBedLeaveEvent evt) {
 		//We don't want a message when the day comes up
 		if(evt.getPlayer().getWorld().getTime() > NIGHT_TICK) {
-			refreshStats(evt);
+			refreshStats();
 			sendMessage(formatMessage(evt.getPlayer(), lg.get("leave_bed")));
 		} else {
-			try {
-				Sound sound = Sound.valueOf(""+getConfig().getString("sound.wakeup"));
-				evt.getPlayer().playSound(evt.getPlayer().getLocation(), sound, 10, 1);
-			}catch (IllegalArgumentException  e) {}
+			sh.playFromConfig(evt.getPlayer(), "sound.wakeup");
 		}
 	}
 	
@@ -127,6 +139,9 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 			for(World w : Bukkit.getWorlds()){
 				if(w.getEnvironment() == Environment.NORMAL) {
 					w.setTime(DAY_TICK);
+					w.setThundering(false);
+					w.setStorm(false);
+					w.setWeatherDuration(getWeatherDuration());
 				}
 			}
 			sendMessage(lg.get("passing_night"));
@@ -138,28 +153,13 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 	 */
 	
 	private void refreshStats() {
-		refreshStats(null);
-	}
-	private void refreshStats(PlayerEvent evt) {
 		int count = 0;
 		int sleeping = 0;
-		Player p = null;
-		boolean enter = false;
-		
-		if(evt != null) {
-			p = evt.getPlayer();
-			enter = evt instanceof PlayerBedEnterEvent;
-		}
 		
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 			if (isCountable(player)) {
 				count++;
-				//Special case to handle correctly events
-				if(p != null && p.equals(player)) {
-					if(enter) {
-						sleeping++;
-					}
-				} else if (player.getSleepTicks() > 0) {
+				if (player.getSleepTicks() > 0) {
 					sleeping++;
 				}
 			}
@@ -209,6 +209,11 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 		}
 
 		countable = gm;
+	}
+
+	private int getWeatherDuration() {
+		Random r = new Random();
+		return (int) (r.nextInt((int) (MAX_WEATHER_TICK - MIN_WEATHER_TICK)) + MIN_WEATHER_TICK);
 	}
 
 }
