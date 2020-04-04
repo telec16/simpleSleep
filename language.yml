@@ -3,11 +3,11 @@ language: enUs
 lang:
   enUs:
     updated: 'Updated to configuration files'
-    enter_bed: '<player> is sleeping ! Wanna join them ? (<count>/<total> - <percentage>% - need <goal>%)'
-    leave_bed: '<player> is not sleepy anymore... (<count>/<total> - <percentage>% - need <goal>%)'
-    passing_night: 'Howdy ! A new day for new adventures !'
+    enter_bed: '&6<player>&f is sleeping ! Wanna join them ? (<count>/<total> - <percentage>% - &4need <goal>%)'
+    leave_bed: '&6<player>&f is not sleepy anymore... (<count>/<total> - <percentage>% - &4need <goal>%)'
+    passing_night: '&cHowdy&f ! A new day for new &dadventures&f !'
   frFR:
     updated: 'Mis à jour à partir des fichiers de configuration'
-    enter_bed: '<player> est en train de dormir ! Voulez vous lae rejoindre ? (<count>/<total> - <percentage>% - besoin de <goal>%)'
-    leave_bed: '<player> n''a plus sommeil... (<count>/<total> - <percentage>% - besoin de <goal>%)'
-    passing_night: 'Cocorico !'
+    enter_bed: '&6<player>&f est en train de dormir ! Voulez vous lae rejoindre ? (<count>/<total> - <percentage>% - &4besoin de <goal>%)'
+    leave_bed: '&6<player>&f n''a plus sommeil... (<count>/<total> - <percentage>% - &4besoin de <goal>%)'
+    passing_night: '&cCocorico !'

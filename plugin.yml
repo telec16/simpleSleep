@@ -1,7 +1,7 @@
 name: simpleSleep
 prefix: simpleSleep
 main: fr.telec.simpleSleep.SimpleSleep
-version: 1.3
+version: 1.4
 api-version: 1.15
 softdepend:
 - SimpleCore

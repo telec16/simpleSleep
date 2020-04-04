@@ -173,6 +173,7 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 		msg = StringHandler.colorize(msg);
 		
 		if(getConfig().getBoolean("use_actionbar")) {
+			// TODO: Add native compability for Spigot & PaperCraft
 			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 				if (isCountable(player)) {
 					ActionBarAPI.sendActionBar(player, msg);
@@ -193,7 +194,7 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 		values.put("percentage", percentage.toString());
 		values.put("goal", goal.toString());
 
-		return StringHandler.format(msg, values);
+		return StringHandler.translate(msg, values);
 	}
 
 	private boolean isCountable(Player player) {
