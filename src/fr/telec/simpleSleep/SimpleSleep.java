@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,8 +26,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
 import fr.telec.simpleCore.Language;
-import fr.telec.simpleCore.StringHandler;
 import fr.telec.simpleCore.SoundHelper;
+import fr.telec.simpleCore.StringHandler;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class SimpleSleep extends JavaPlugin implements Listener {
 
@@ -173,10 +176,19 @@ public class SimpleSleep extends JavaPlugin implements Listener {
 		msg = StringHandler.colorize(msg);
 		
 		if(getConfig().getBoolean("use_actionbar")) {
-			// TODO: Add native compability for Spigot & PaperCraft
 			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 				if (isCountable(player)) {
-					ActionBarAPI.sendActionBar(player, msg);
+					if(Bukkit.getVersion().toLowerCase().contains("spigot")) {
+						player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+					} /*else if(Bukkit.getVersion().toLowerCase().contains("papermc")) {
+						player.sendActionBar(TextComponent.fromLegacyText(msg));
+					}*/ else { //Bukkit.getVersion().toLowerCase().contains("bukkit")
+						try {
+							ActionBarAPI.sendActionBar(player, msg);
+						} catch (NoClassDefFoundError e) {
+							getLogger().log(Level.SEVERE, "Please install the ActionBar API (https://www.spigotmc.org/resources/actionbarapi-1-8-1-14-2.1315/)");
+						}
+					}
 				}
 			}
 		} else {
